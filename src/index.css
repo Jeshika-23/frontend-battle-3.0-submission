@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@import "./styles/animations.css";
+
+
+@theme {
+  --color-brand-bg: #172B36;
+  --color-brand-secondary: #114C5A;
+  --color-brand-accent: #FFC801;
+  --color-brand-orange: #FF9932;
+  --color-brand-light: #D9E8E2;
+  --color-brand-white: #F1F6F4;
+  
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+/* Custom Base Styling */
+html, body {
+  background-color: #172B36; /* fallback */
+  background-color: var(--color-brand-bg);
+  color: var(--color-brand-white);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  margin: 0;
+  padding: 0;
+}
+
+/* Smooth Focus Rings */
+*:focus-visible {
+  outline: 2px solid var(--color-brand-accent);
+  outline-offset: 4px;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-brand-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-secondary);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-accent);
+}
