@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 /**
  * Custom hook to track window width and height.
- * Optimized with requestAnimationFrame to prevent layout thrashing on rapid resize.
+ * Optimized with a 100ms debounce and passive resize listeners to prevent layout thrashing.
  */
 export default function useWindowSize() {
   const [windowSize, setWindowSize] = useState({
@@ -16,28 +16,24 @@ export default function useWindowSize() {
     let timeoutId = null;
 
     const handleResize = () => {
-      // Throttle window resize updates using requestAnimationFrame or short debounce
       if (timeoutId) {
-        cancelAnimationFrame(timeoutId);
+        clearTimeout(timeoutId);
       }
       
-      timeoutId = requestAnimationFrame(() => {
+      timeoutId = setTimeout(() => {
         setWindowSize({
           width: window.innerWidth,
           height: window.innerHeight,
         });
-      });
+      }, 100);
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize, { passive: true });
     
-    // Initial call
-    handleResize();
-
     return () => {
       window.removeEventListener('resize', handleResize);
       if (timeoutId) {
-        cancelAnimationFrame(timeoutId);
+        clearTimeout(timeoutId);
       }
     };
   }, []);

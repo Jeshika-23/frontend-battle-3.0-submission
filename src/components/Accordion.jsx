@@ -1,14 +1,11 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 /**
  * Accordion - Accessible, custom mobile representation of the Bento features list.
  * Animates open/close states smoothly using CSS grid-template-rows transition.
- * 
- * @param {Array} items - List of features with badges, descriptions, icons
- * @param {number} activeIndex - Parent-managed state index
- * @param {Function} setActiveIndex - Parent setter to update index
+ * Wrap in React.memo to prevent unnecessary re-renderings.
  */
-export default function Accordion({ items, activeIndex, setActiveIndex }) {
+const Accordion = memo(({ items, activeIndex, setActiveIndex }) => {
   const handleToggle = (index) => {
     // If clicking the already open item, toggle it off or keep it open.
     // Standard accordion behaviour keeps at least one open or collapses. Let's toggle.
@@ -51,7 +48,6 @@ export default function Accordion({ items, activeIndex, setActiveIndex }) {
                   <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25l-7.5 7.5l-7.5-7.5" />
                 </svg>
               </span>
-
 
             </button>
 
@@ -111,4 +107,8 @@ export default function Accordion({ items, activeIndex, setActiveIndex }) {
       })}
     </div>
   );
-}
+});
+
+Accordion.displayName = 'Accordion';
+export default Accordion;
+

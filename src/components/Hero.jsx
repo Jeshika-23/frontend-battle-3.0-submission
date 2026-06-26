@@ -37,7 +37,7 @@ export default function Hero() {
       </p>
 
       {/* Action CTA Buttons */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-hero-fade delay-400">
+      <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8 animate-hero-fade delay-400">
         <a
           href="#pricing"
           className="w-full sm:w-auto px-8 py-4 bg-[#FFC801] text-[#172B36] font-bold text-sm md:text-base rounded-xl btn-glow-primary transition-all text-center"
@@ -51,6 +51,23 @@ export default function Hero() {
           Explore Architecture
         </a>
       </div>
+
+      {/* Trust row */}
+      <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 mb-16 text-brand-light/70 font-mono text-xs md:text-sm animate-hero-fade delay-400 select-none">
+        <span className="flex items-center gap-1.5">
+          <span className="text-[#FFC801] font-bold">✓</span> Enterprise Ready
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="text-[#FFC801] font-bold">✓</span> 99.99% Uptime
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="text-[#FF9932] font-bold">✓</span> SOC2 Secure
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="text-[#FFC801] font-bold">✓</span> Millions of AI Tasks Processed
+        </span>
+      </div>
+
 
       {/* Hero Illustration - Interactive SVG Pipeline Animation with Floating Cards */}
       <div className="w-full max-w-4xl mx-auto relative px-0 md:px-12 animate-hero-reveal delay-400">

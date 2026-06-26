@@ -1,5 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
-import useWindowSize from '../hooks/useWindowSize';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Accordion from './Accordion';
 import { FEATURES_DATA } from '../data/features';
 
@@ -10,10 +9,21 @@ import { FEATURES_DATA } from '../data/features';
  * Optimized for React rendering cycles, SEO, and visual performance.
  */
 export default function BentoFeatures() {
-  const { width } = useWindowSize();
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(
+    typeof window !== 'undefined' ? window.matchMedia('(min-width: 1024px)').matches : true
+  );
   
   const cardsRef = useRef([]);
+
+  // Native media query listener to prevent resizing re-renders
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const media = window.matchMedia('(min-width: 1024px)');
+    const listener = (e) => setIsDesktop(e.matches);
+    media.addEventListener('change', listener);
+    return () => media.removeEventListener('change', listener);
+  }, []);
 
   // Memoized mouse-move handler to prevent recreation on every render cycle
   const handleMouseMove = useCallback((e, index) => {
@@ -28,7 +38,6 @@ export default function BentoFeatures() {
     card.style.setProperty('--mouse-y', `${y}px`);
   }, []);
 
-  const isDesktop = width >= 1024;
 
   // Icon render helper mapping string name to premium inline SVGs with explicit sizing
   const renderIcon = (type) => {

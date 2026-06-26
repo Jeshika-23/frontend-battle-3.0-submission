@@ -1,12 +1,88 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 /**
- * TrustedCompanies - Seamless scrolling loop marquee displaying corporate client logos.
- * Uses CSS animation to guarantee hardware-accelerated movement with minimal CPU usage.
- * Refactored to define explicit SVG dimensions to avoid layout shifts (CLS).
+ * CountUp - Scroll-triggered counting number animation.
+ * Uses requestAnimationFrame with Ease-Out Quad mapping for visual fluidity.
+ * Tabular numerals ensure text elements do not shift horizontally while counting.
+ */
+function CountUp({ end, duration = 1500, suffix = "", decimals = 0 }) {
+  const [count, setCount] = useState(0);
+  const [started, setStarted] = useState(false);
+  const elementRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setStarted(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (elementRef.current) {
+      observer.observe(elementRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
+
+    const endNum = parseFloat(end);
+    if (isNaN(endNum)) {
+      setCount(end);
+      return;
+    }
+    
+    const startTime = performance.now();
+    let animationFrameId;
+    
+    const updateCount = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      const easedProgress = progress * (2 - progress); // Ease out quad formula
+      const currentCount = easedProgress * endNum;
+      
+      setCount(currentCount);
+      
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(updateCount);
+      } else {
+        setCount(endNum);
+      }
+    };
+    
+    animationFrameId = requestAnimationFrame(updateCount);
+    
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, [end, duration, started]);
+
+  const formattedCount = count.toFixed(decimals);
+  const displayValue = decimals === 0 
+    ? parseInt(formattedCount, 10).toLocaleString('en-US') 
+    : formattedCount;
+
+  return (
+    <span ref={elementRef} className="tabular-nums">
+      {displayValue}{suffix}
+    </span>
+  );
+}
+
+/**
+ * TrustedCompanies - Seamless scrolling logo marquee + animated KPI performance grid.
  */
 export default function TrustedCompanies() {
-  // SVG logos with explicit width & height properties matching viewBox sizes
   const companies = [
     {
       name: 'Acme Corp',
@@ -68,12 +144,11 @@ export default function TrustedCompanies() {
     }
   ];
 
-  // Repeat logos twice to ensure loop scroll is continuous
   const marqueeItems = [...companies, ...companies];
 
   return (
     <section
-      className="py-12 bg-[#114C5A]/15 border-y border-brand-light/5 overflow-hidden"
+      className="py-12 bg-[#114C5A]/15 border-y border-brand-light/5 overflow-hidden animate-hero-reveal"
       aria-label="Companies who trust AetherFlow"
     >
       <div className="max-w-7xl mx-auto px-4 text-center mb-6">
@@ -83,7 +158,6 @@ export default function TrustedCompanies() {
       </div>
 
       <div className="relative w-full flex items-center overflow-hidden">
-        {/* Left and Right blur covers to blend marquee smoothly */}
         <div className="absolute top-0 left-0 w-16 md:w-32 h-full bg-gradient-to-r from-brand-bg to-transparent z-10 pointer-events-none" />
         <div className="absolute top-0 right-0 w-16 md:w-32 h-full bg-gradient-to-l from-brand-bg to-transparent z-10 pointer-events-none" />
 
@@ -99,9 +173,9 @@ export default function TrustedCompanies() {
         </div>
       </div>
 
-      {/* Platform KPI Metrics Grid */}
+      {/* Platform KPI Metrics Grid (Scroll-observed dynamic counter widgets) */}
       <div className="max-w-7xl mx-auto px-4 mt-16 pt-12 border-t border-brand-light/5">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 text-center">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           
           {/* Active Users */}
           <div className="flex flex-col items-center p-4 rounded-2xl bg-[#114C5A]/10 border border-brand-light/5 hover:border-brand-light/10 transition-all duration-300">
@@ -111,7 +185,9 @@ export default function TrustedCompanies() {
                 <path d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z"/>
               </svg>
             </div>
-            <span className="font-mono text-xl md:text-2xl font-bold text-brand-white">142K+</span>
+            <span className="font-mono text-xl md:text-2xl font-bold text-brand-white">
+              <CountUp end={50} suffix="K+" />
+            </span>
             <span className="text-[10px] uppercase font-mono tracking-wider text-brand-light/50 mt-1">Active Users</span>
           </div>
 
@@ -123,7 +199,9 @@ export default function TrustedCompanies() {
                 <path d="M15 12a3 3 0 1 1-6 0a3 3 0 0 1 6 0Z" />
               </svg>
             </div>
-            <span className="font-mono text-xl md:text-2xl font-bold text-brand-white">8.2B+</span>
+            <span className="font-mono text-xl md:text-2xl font-bold text-brand-white">
+              <CountUp end={12} suffix="M+" />
+            </span>
             <span className="text-[10px] uppercase font-mono tracking-wider text-brand-light/50 mt-1">AI Tasks</span>
           </div>
 
@@ -134,29 +212,22 @@ export default function TrustedCompanies() {
                 <path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 0 1 5.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
               </svg>
             </div>
-            <span className="font-mono text-xl md:text-2xl font-bold text-brand-white">99.99%</span>
+            <span className="font-mono text-xl md:text-2xl font-bold text-brand-white">
+              <CountUp end={99.98} decimals={2} suffix="%" />
+            </span>
             <span className="text-[10px] uppercase font-mono tracking-wider text-brand-light/50 mt-1">Uptime SLA</span>
           </div>
 
-          {/* Customer Satisfaction */}
-          <div className="flex flex-col items-center p-4 rounded-2xl bg-[#114C5A]/10 border border-brand-light/5 hover:border-brand-light/10 transition-all duration-300 col-span-1">
-            <div className="text-[#FFC801] p-2 bg-[#FFC801]/5 rounded-lg mb-2">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" width="20" height="20">
-                <path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-              </svg>
-            </div>
-            <span className="font-mono text-xl md:text-2xl font-bold text-brand-white">4.9/5.0</span>
-            <span className="text-[10px] uppercase font-mono tracking-wider text-brand-light/50 mt-1">Satisfaction</span>
-          </div>
-
           {/* Enterprise Customers */}
-          <div className="flex flex-col items-center p-4 rounded-2xl bg-[#114C5A]/10 border border-brand-light/5 hover:border-brand-light/10 transition-all duration-300 col-span-2 md:col-span-1">
+          <div className="flex flex-col items-center p-4 rounded-2xl bg-[#114C5A]/10 border border-brand-light/5 hover:border-brand-light/10 transition-all duration-300">
             <div className="text-[#FF9932] p-2 bg-[#FF9932]/5 rounded-lg mb-2">
               <svg viewBox="0 0 16 16" className="w-5 h-5 fill-current" aria-hidden="true" width="20" height="20">
                 <path d="M8.372 1.349a.75.75 0 0 0-.744 0l-4.81 2.748L8 7.131l5.182-3.034zM14 5.357L8.75 8.43v6.005l4.872-2.784A.75.75 0 0 0 14 11zm-6.75 9.078V8.43L2 5.357V11c0 .27.144.518.378.651z" />
               </svg>
             </div>
-            <span className="font-mono text-xl md:text-2xl font-bold text-brand-white">450+</span>
+            <span className="font-mono text-xl md:text-2xl font-bold text-brand-white">
+              <CountUp end={500} suffix="+" />
+            </span>
             <span className="text-[10px] uppercase font-mono tracking-wider text-brand-light/50 mt-1">Enterprise Clients</span>
           </div>
 
